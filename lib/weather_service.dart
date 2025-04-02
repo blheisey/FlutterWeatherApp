@@ -7,10 +7,10 @@ class WeatherService {
   final String apiKey = ''; 
 
   // Function to fetch weather data by city name
-  Future<Map<String, dynamic>> fetchWeather(String city) async {
+  Future<Map<String, dynamic>> fetchWeather(String city, String method) async {
     // Construct the full URL with the city name and API key
     //CHANGE THIS!!
-    final url = Uri.parse('$apiUrl?q=$city&appid=$apiKey&units=metric');
+    final url = Uri.parse('$apiUrl$method?q=$city&key=$apiKey&units=metric');
     
     try {
       // Make the HTTP request
