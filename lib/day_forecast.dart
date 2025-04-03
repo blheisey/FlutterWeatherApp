@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
+import 'temperature_graph.dart'; // Import your TemperatureLineChart widget 
 
 class ForecastPage extends StatelessWidget {
-  final String day;
+  final List<String> hourlyTimes; // Added for hourly forecast
+  final List<double> hourlyTemps; // Added for hourly forecast
+  
 
-  ForecastPage({required this.day}); // Accept day as a parameter
+  ForecastPage({required this.hourlyTimes, required this.hourlyTemps}); // Accept day as a parameter
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("$day Forecast")),
+      appBar: AppBar(title: Text("Forecast")),
       body: Center(
-        child: Text(
-          "Weather forecast for $day",
-          style: TextStyle(fontSize: 24),
-        ),
+        child: 
+        TemperatureLineChart(
+        hourlyTemps: hourlyTemps, 
+        hourlyTimes: hourlyTimes,
+        )
       ),
     );
   }

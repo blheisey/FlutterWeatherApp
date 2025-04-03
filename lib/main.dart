@@ -3,6 +3,7 @@ import 'weather_service.dart';
 import 'weather_card.dart'; // Import your WeatherCard widget 
 import 'hourly_weather.dart'; // Import your HourlyForecastWidget widget
 import 'seven_day_forecast.dart'; // Import your SevenDayForecast widget
+ 
 
 
 void main() {
@@ -55,6 +56,7 @@ class MyApp extends StatelessWidget {
       double moonillumination = forecastData["forecast"]["forecastday"][0]["astro"]["moon_illumination"];
       String moonset = forecastData["forecast"]["forecastday"][0]["astro"]["moonset"];
       List<dynamic> hourlyData = forecastData["forecast"]["forecastday"][0]["hour"];
+
 
       List<double> hourlytemps = [];
       List<String> hourlytimes = [];
@@ -123,7 +125,7 @@ class MyHomePage extends StatelessWidget {
 //////////////////////////////////////////////////////////////////////////////////////////////////////
           SizedBox(
           height: 400,  // Adjust the height as needed
-          child: WeatherHomePage(),
+          child: WeatherHomePage(hourlyTimes: hourlyTimes, hourlyTemps: hourlyTemps),
     ),
           // Row containing "Feels like" and "UV Index"
           Row(

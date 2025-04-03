@@ -5,6 +5,11 @@ import 'package:intl/intl.dart'; // For getting the current day name
 
 
 class WeatherHomePage extends StatelessWidget {
+  final List<String> hourlyTimes; // Added for hourly forecast
+  final List<double> hourlyTemps; // Added for hourly forecast
+
+  WeatherHomePage({required this.hourlyTimes, required this.hourlyTemps}); 
+
   @override
   Widget build(BuildContext context) {
     // Define all 7 days of the week
@@ -39,7 +44,7 @@ class WeatherHomePage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ForecastPage(day: reorderedDays[index]),
+                  builder: (context) => ForecastPage(hourlyTimes: hourlyTimes, hourlyTemps: hourlyTemps), // Pass the data to the ForecastPage
                 ),
               );
             },

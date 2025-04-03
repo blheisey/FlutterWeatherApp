@@ -8,11 +8,16 @@ class WeatherService {
 
   // Function to fetch weather data by city name
   Future<Map<String, dynamic>> fetchWeather(String city, String method) async {
-    // Construct the full URL with the city name and API key
-    //CHANGE THIS!!
-    final url = Uri.parse('$apiUrl$method?q=$city&key=$apiKey&units=metric');
-    
+
     try {
+
+    Uri url;
+    if (method == '/forecast.json'){
+      url = Uri.parse('$apiUrl$method?q=$city&key=$apiKey&days=7');
+    }
+    else{
+      url = Uri.parse('$apiUrl$method?q=$city&key=$apiKey');
+    }
       // Make the HTTP request
       final response = await http.get(url);
       
