@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;  // For making HTTP requests
 class WeatherService {
   // Define the API endpoint (e.g., OpenWeatherMap API)
   final String apiUrl = 'http://api.weatherapi.com/v1'; 
-  final String apiKey = ''; 
+  final String apiKey = '5a2b518baaa643d297871947251003'; 
 
   // Function to fetch weather data by city name
   Future<Map<String, dynamic>> fetchWeather(String city, String method) async {
@@ -13,7 +13,7 @@ class WeatherService {
 
     Uri url;
     if (method == '/forecast.json'){
-      url = Uri.parse('$apiUrl$method?q=$city&key=$apiKey&days=7');
+      url = Uri.parse('$apiUrl$method?q=$city&key=$apiKey');
     }
     else{
       url = Uri.parse('$apiUrl$method?q=$city&key=$apiKey');
