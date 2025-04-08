@@ -3,17 +3,18 @@ import 'weather_service.dart';
 import 'weather_card.dart'; // Import your WeatherCard widget 
 import 'hourly_weather.dart'; // Import your HourlyForecastWidget widget
 import 'seven_day_forecast.dart'; // Import your SevenDayForecast widget
- 
+import 'package:firebase_core/firebase_core.dart';
 
 
-void main() {
-  runApp(const MyApp());
+
+
+Future<void> main() async{
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -23,57 +24,77 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
       ),
       home: FutureBuilder<List<Map<String, dynamic>>>(
-      future: Future.wait([
-    WeatherService().fetchWeather("Missoula", "/current.json"), // Fetch current weather
-    WeatherService().fetchWeather("Missoula", "/forecast.json") // Fetch forecast weather
-  ]),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return Center(child: CircularProgressIndicator()); // Show loading spinner while waiting
-    } else if (snapshot.hasError) {
-      return Center(child: Text("Error: ${snapshot.error}")); // Handle errors
-    } else if (snapshot.hasData) {
-      // Extract data from both responses
-      final currentData = snapshot.data![0]; // First API response (current weather)
-      final forecastData = snapshot.data![1]; // Second API response (forecast)
+        future: Future.wait([
+          WeatherService().fetchCurrentWeather(),
+          WeatherService().fetchForecastWeather(),
+        ]),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          } else if (snapshot.hasData) {
+            final currentData = snapshot.data![0];
+            final forecastData = snapshot.data![1];
 
-      // Extract current weather details
-      String location = currentData["location"]["name"];
-      double tempf = currentData["current"]["temp_f"];
-      String condition = currentData["current"]["condition"]["text"];
-      double feelslikef = currentData["current"]["feelslike_f"];
-      double uv = currentData["current"]["uv"];
-      double wind_mph = currentData["current"]["wind_mph"];
-      double gust_mph = currentData["current"]["gust_mph"];
-      double winddegree = currentData["current"]["wind_degree"];
-      String winddir = currentData["current"]["wind_dir"];
-      double vis = currentData["current"]["vis_miles"];
-      double humid = currentData["current"]["humidity"];
+            // 🌤️ Extract current weather fields
+            final String location = currentData['location'];
+            final double tempf = (currentData['temp_f'] as num).toDouble();
+            final String condition = currentData['condition'];
+            final double feelslikef = (currentData['feelslike_f'] as num).toDouble();
+            final double uv = (currentData['uv'] as num).toDouble();
+            final double wind_mph = (currentData['wind_mph'] as num).toDouble();
+            final double gust_mph = (currentData['gust_mph'] as num).toDouble();
+            final double winddegree = currentData['wind_degree'].toDouble();
+            final String winddir = currentData['wind_dir'];
+            final double vis = (currentData['vis_miles'] as num).toDouble();
+            final double humid = currentData['humidity'].toDouble();
 
-      // Extract forecast details
-      String sunset = forecastData["forecast"]["forecastday"][0]["astro"]["sunset"];
-      double predictprecipin = forecastData["forecast"]["forecastday"][0]["day"]["totalprecip_in"];
-      String moonphase = forecastData["forecast"]["forecastday"][0]["astro"]["moon_phase"];
-      double moonillumination = forecastData["forecast"]["forecastday"][0]["astro"]["moon_illumination"];
-      String moonset = forecastData["forecast"]["forecastday"][0]["astro"]["moonset"];
-      List<dynamic> hourlyData = forecastData["forecast"]["forecastday"][0]["hour"];
+            // 🌙 Extract forecast fields
+            final forecastCurrent = forecastData['forecast'];
+            final astro = forecastCurrent['forecastday'][0]['astro'];
+            final hourList = forecastCurrent['forecastday'][0]['hour'];
 
+            final String sunset = astro['sunset'];
+            final double predictprecipin = (hourList[0]['precip_in'] as num).toDouble();
+            final String moonphase = astro['moon_phase'];
+            final String moonset = astro['moonset'];
+            final double moonillumination = astro['moon_illumination'].toDouble();
 
-      List<double> hourlytemps = [];
-      List<String> hourlytimes = [];
+            // 🕒 Prepare hourly forecast lists
+            List<double> hourlytemps = [];
+            List<String> hourlytimes = [];
 
-      for (var hour in hourlyData) {
-        hourlytemps.add(hour["temp_f"].toDouble()); // Ensure it's a double
-        hourlytimes.add(hour["time"].toString());  // Ensure it's a string
-      }
+            for (var hour in hourList) {
+              hourlytemps.add((hour['temp_f'] as num).toDouble());
+              hourlytimes.add(hour['time'].toString());
+            }
 
-          return MyHomePage(loc: location, tempF: tempf, cond: condition, feelslikeF: feelslikef, uvIndex: uv, windMPH: wind_mph, gustMPH: gust_mph, windDegree: winddegree, windDir: winddir, visibility: vis, humidity: humid, sundown: sunset, predictPrecipIn: predictprecipin, moonPhase: moonphase, moonSet: moonset, moonIllumination: moonillumination, hourlyTimes: hourlytimes, hourlyTemps: hourlytemps); // Pass it to your home screen
-      } else {
-        return Center(child: Text("No data available"));
-      }
-      },
-    ),
-
+            return MyHomePage(
+              loc: location,
+              tempF: tempf,
+              cond: condition,
+              feelslikeF: feelslikef,
+              uvIndex: uv,
+              windMPH: wind_mph,
+              gustMPH: gust_mph,
+              windDegree: winddegree,
+              windDir: winddir,
+              visibility: vis,
+              humidity: humid,
+              sundown: sunset,
+              predictPrecipIn: predictprecipin,
+              moonPhase: moonphase,
+              moonSet: moonset,
+              moonIllumination: moonillumination,
+              hourlyTimes: hourlytimes,
+              hourlyTemps: hourlytemps,
+            );
+          } else {
+            return const Center(child: Text("No data available"));
+          }
+        },
+      ),
     );
   }
 }
